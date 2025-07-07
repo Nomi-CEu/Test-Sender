@@ -1,0 +1,31 @@
+on:
+  workflow_dispatch:
+
+jobs:
+  notifyNomiCEu:
+    name: Notify Nomi-CEu
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get Token
+        id: token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_KEY }}
+          owner: Nomi-CEu
+
+      - name: Dispatch Workflow
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{ steps.token.outputs.token }}
+          # A Javascript Function Body to send the Workflow Dispatch Event.
+          script: |
+            await github.rest.repos.createDispatchEvent({
+              owner: "Nomi-CEu", 
+              repo: "Test-Reciever",
+              event_type: "labs_released",
+              client_payload: {
+                ver: "v10.10.5",
+                id: "1234567890"
+              },
+            });
